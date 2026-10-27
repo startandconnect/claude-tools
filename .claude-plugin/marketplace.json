@@ -1,0 +1,16 @@
+{
+  "name": "claude-tools",
+  "owner": {
+    "name": "Start & Connect"
+  },
+  "metadata": {
+    "description": "Werkzeuge für Claude Code von Start & Connect."
+  },
+  "plugins": [
+    {
+      "name": "cache-context",
+      "source": "./cache-context",
+      "description": "Band über dem Eingabefeld (Kontext, Cache, Nutzung) und automatischer Session-Abschluss mit Compact, bevor der Cache abläuft."
+    }
+  ]
+}

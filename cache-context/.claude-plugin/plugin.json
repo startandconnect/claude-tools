@@ -1,0 +1,9 @@
+{
+  "name": "cache-context",
+  "version": "1.0.0",
+  "description": "Band über dem Eingabefeld (Kontext, Cache, Nutzung) und Automatik: nach 50 min Ruhe sichert der Chat seinen Stand, nach 55 min komprimiert er sich (Compact), bei 95 % Kontext sofort. Beendet die App den Prozess, holt der nächste Start beides nach.",
+  "author": {
+    "name": "Start & Connect"
+  },
+  "types": "./types/index.d.ts"
+}
