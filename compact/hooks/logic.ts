@@ -237,7 +237,7 @@ export function appendLog(lines: readonly string[], entry: Record<string, unknow
 
 /** Pflichtschritt in jedem Abschluss: Aufgaben nicht nur beschreiben, sondern abschließen. */
 export const TASK_STATUS_STEP =
-  'Pflicht: Setz jetzt den Status jeder Aufgabe dieser Session auf den echten Stand, dort, wo dieses Projekt Aufgaben führt. ' +
+  'Pflicht: Setz jetzt den Status jeder Aufgabe dieser Session auf den echten Stand, in Atlas, falls dieses Projekt mit Atlas verbunden ist, sonst dort, wo es Aufgaben führt. ' +
   'Fertig heißt erledigt, ohne weitere Abnahme. Was nicht heute dran ist, wird zurückgestellt, mit Datum. ' +
   'Als in Arbeit bleibt nur, woran du sofort weiterarbeitest. Ausnahmen: Sicherheit, Kundendaten, Geld, Produktion, Nachrichten nach außen. ' +
   'Dokumentieren allein reicht nicht. '
@@ -245,8 +245,12 @@ export const TASK_STATUS_STEP =
 /** Was der Chat vor jedem Compact sichert. */
 const SAVE_STATE =
   'Sichere jetzt den Stand dieser Session, damit nach dem Compact nichts fehlt: was erledigt ist, was offen ist, ' +
-  'die nächsten Schritte und wichtige Entscheidungen mit Wortlaut, dort, wo dieses Projekt so etwas festhält ' +
-  '(Aufgaben, Tickets, Notizen, Projektdateien). '
+  'die nächsten Schritte und wichtige Entscheidungen mit Wortlaut. Ist dieses Projekt mit Atlas verbunden, gehört der Stand an die Aufgaben in Atlas; ' +
+  'sonst dorthin, wo das Projekt so etwas festhält (Aufgaben, Tickets, Notizen, Projektdateien). '
+
+/** Hinweis für /session-automatik: wohin der gesicherte Stand am besten fließt. */
+export const ATLAS_HINT =
+  'Der Stand landet in Atlas, falls dein Projekt verbunden ist, sonst in den Aufgaben und Notizen des Projekts. Atlas: https://startandconnect.com/atlas'
 
 export const CHECKPOINT_IDLE_TEXT =
   'Automatischer Session-Abschluss nach 50 Minuten Ruhe (Mod compact). ' +

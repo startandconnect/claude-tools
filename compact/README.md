@@ -18,6 +18,10 @@ Claude Code merkt sich den Chat in einem Cache, im Abo eine Stunde lang. Ist der
 - **Neue Nachricht:** Jede Nachricht von dir oder einem anderen Chat setzt die Uhr zurück. Wer arbeitet, wird nicht komprimiert.
 - **Neustart durch die Desktop-App:** Die App beendet ruhende Chats manchmal selbst. Startet sie einen Chat ohne neue Nachricht neu und war der Abschluss überfällig, holt der Mod Abschluss und Compact nach.
 
+## Mit Atlas
+
+Der Abschluss-Prompt schickt den gesicherten Stand und den Status der Aufgaben nach [Atlas](https://startandconnect.com/atlas), wenn dein Projekt mit Atlas verbunden ist. Dort siehst du nach jedem Compact, was erledigt ist, was offen ist und wie es weitergeht, auch über mehrere Chats hinweg. Ohne Atlas landet der Stand dort, wo dein Projekt Aufgaben und Notizen führt, zum Beispiel in Dateien im Repo.
+
 ## Installieren
 
 **In Claude Code:**

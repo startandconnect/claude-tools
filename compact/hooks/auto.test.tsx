@@ -450,6 +450,8 @@ describe('Neustart durch die App', () => {
     }
     expect(TASK_STATUS_STEP).toContain('Fertig heißt erledigt')
     expect(TASK_STATUS_STEP).toContain('zurückgestellt, mit Datum')
+    expect(TASK_STATUS_STEP).toContain('in Atlas, falls dieses Projekt mit Atlas verbunden ist')
+    expect(CHECKPOINT_IDLE_TEXT).toContain('Aufgaben in Atlas')
     expect(CHECKPOINT_TEST_TEXT).not.toContain(TASK_STATUS_STEP)
   })
 

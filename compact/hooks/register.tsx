@@ -3,6 +3,7 @@ import type { EngineInterface, Register, SessionContextUsage, SessionRateLimit }
 
 import type { Auto, Limit } from '../types'
 import {
+  ATLAS_HINT,
   CHECKPOINT_IDLE_TEXT,
   CHECKPOINT_TEST_TEXT,
   CLOCK_STALE_MS,
@@ -313,7 +314,7 @@ export const register: Register = on => {
         : `an${a.isTest ? ' (Test: 2/4 min)' : ' (50/55 min)'}, Phase ${a.phase}${a.idleSince > 0 && a.phase === 'active' ? `, ruhig seit ${Math.floor((at - a.idleSince) / 60_000)} min` : ''}`
 
     return {
-      text: `Session-Automatik: ${state}. Uhr zuletzt vor ${Math.round((at - lastTickAt) / 1000)} s. Letzte Ereignisse: ${logLines.slice(-3).map(l => (JSON.parse(l) as { event?: string }).event).join(', ') || '(noch keine)'}. Befehle: /session-automatik test | normal | aus | an`,
+      text: `Session-Automatik: ${state}. Uhr zuletzt vor ${Math.round((at - lastTickAt) / 1000)} s. Letzte Ereignisse: ${logLines.slice(-3).map(l => (JSON.parse(l) as { event?: string }).event).join(', ') || '(noch keine)'}. Befehle: /session-automatik test | normal | aus | an. ${ATLAS_HINT}`,
     }
   })
 
