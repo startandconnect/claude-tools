@@ -4,7 +4,7 @@ Werkzeuge für [Claude Code](https://claude.com/claude-code) von Start & Connect
 
 | Tool | Was es tut |
 |---|---|
-| [cache-context](cache-context/) | Band über dem Eingabefeld mit Kontext, Cache-Restzeit und Nutzung. Nach 50 Minuten Ruhe sichert der Chat seinen Stand, nach 55 Minuten komprimiert er sich, bevor der Cache abläuft. |
+| [compact](compact/) | Band über dem Eingabefeld mit Kontext, Cache-Restzeit und Nutzung. Nach 50 Minuten Ruhe sichert der Chat seinen Stand, nach 55 Minuten komprimiert er sich, bevor der Cache abläuft. |
 
 ## Installieren
 
@@ -12,7 +12,7 @@ Einmal den Katalog anmelden, dann je Tool installieren:
 
 ```
 /plugin marketplace add startandconnect/claude-tools
-/plugin install cache-context@claude-tools
+/plugin install compact@claude-tools
 /reload-plugins
 ```
 

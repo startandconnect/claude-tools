@@ -249,7 +249,7 @@ const SAVE_STATE =
   '(Aufgaben, Tickets, Notizen, Projektdateien). '
 
 export const CHECKPOINT_IDLE_TEXT =
-  'Automatischer Session-Abschluss nach 50 Minuten Ruhe (Mod cache-context). ' +
+  'Automatischer Session-Abschluss nach 50 Minuten Ruhe (Mod compact). ' +
   SAVE_STATE +
   TASK_STATUS_STEP +
   'Fang nichts Neues an und stell keine Rückfragen. Laufende Hintergrund-Prozesse lässt du laufen. ' +
@@ -261,7 +261,7 @@ export const CHECKPOINT_TEST_TEXT =
 
 export function checkpointResumeText(idleMinutes: number): string {
   return (
-    `Automatischer Session-Abschluss, nachgeholt (Mod cache-context): Die App hatte diesen Chat nach ${idleMinutes} Minuten Ruhe beendet, ` +
+    `Automatischer Session-Abschluss, nachgeholt (Mod compact): Die App hatte diesen Chat nach ${idleMinutes} Minuten Ruhe beendet, ` +
     'bevor Abschluss und Compact liefen. ' +
     SAVE_STATE +
     TASK_STATUS_STEP +
@@ -272,7 +272,7 @@ export function checkpointResumeText(idleMinutes: number): string {
 
 export function checkpointContextText(percent: number): string {
   return (
-    `Kontext bei ${percent} % (Grenze ${CONTEXT_LIMIT} %, Mod cache-context). ` +
+    `Kontext bei ${percent} % (Grenze ${CONTEXT_LIMIT} %, Mod compact). ` +
     SAVE_STATE +
     TASK_STATUS_STEP +
     'Danach komprimiert sich der Chat automatisch (Compact, kein Clear); danach machst du mit dem gesicherten Stand weiter.'

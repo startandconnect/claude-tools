@@ -1,8 +1,8 @@
-# cache-context
+# compact
 
 Ein Mod für Claude Code, der lange Sessions billig hält. Teil von [claude-tools](../README.md).
 
-Claude Code merkt sich den Chat in einem Cache, im Abo eine Stunde lang. Ist der Cache kalt oder der Kontext voll, liest die nächste Nachricht den ganzen Chat zum vollen Preis neu ein. cache-context zeigt dir, wie es steht. Bevor der Cache abläuft, lässt er den Chat seinen Stand sichern und komprimiert ihn dann.
+Claude Code merkt sich den Chat in einem Cache, im Abo eine Stunde lang. Ist der Cache kalt oder der Kontext voll, liest die nächste Nachricht den ganzen Chat zum vollen Preis neu ein. compact zeigt dir, wie es steht. Bevor der Cache abläuft, lässt er den Chat seinen Stand sichern und komprimiert ihn dann.
 
 ## Was er tut
 
@@ -24,13 +24,13 @@ Claude Code merkt sich den Chat in einem Cache, im Abo eine Stunde lang. Ist der
 
 ```
 /plugin marketplace add startandconnect/claude-tools
-/plugin install cache-context@claude-tools
+/plugin install compact@claude-tools
 /reload-plugins
 ```
 
 **Claude installieren lassen:** Gib Claude Code den Text aus [INSTALL-PROMPT.md](INSTALL-PROMPT.md).
 
-**Als ZIP-Datei:** [cache-context.zip](https://github.com/startandconnect/claude-tools/releases/latest/download/cache-context.zip) herunterladen und entpacken. Dann in Claude Code `/plugin marketplace add <entpackter Ordner>` und `/plugin install cache-context@claude-tools` eingeben.
+**Als ZIP-Datei:** [compact.zip](https://github.com/startandconnect/claude-tools/releases/latest/download/compact.zip) herunterladen und entpacken. Dann in Claude Code `/plugin marketplace add <entpackter Ordner>` und `/plugin install compact@claude-tools` eingeben.
 
 ## Befehle
 
@@ -46,10 +46,14 @@ Claude Code merkt sich den Chat in einem Cache, im Abo eine Stunde lang. Ist der
 - Läuft gerade ein Turn oder steht ein Entwurf im Eingabefeld, wartet er.
 - Ein Compact verliert Einzelheiten. Was der Chat behalten soll, sichert er deshalb vorher selbst.
 
+## Umstieg von cache-context
+
+Bis Version 1.0.0 hieß der Mod cache-context. Hast du ihn so installiert, entferne ihn zuerst mit `/plugin uninstall cache-context@claude-tools`, dann `/plugin marketplace update claude-tools` und `/plugin install compact@claude-tools`.
+
 ## Entfernen
 
 ```
-/plugin uninstall cache-context@claude-tools
+/plugin uninstall compact@claude-tools
 ```
 
 ## Lizenz

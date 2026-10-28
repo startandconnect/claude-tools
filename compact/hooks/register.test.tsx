@@ -3,7 +3,7 @@ import type { On, SessionMeasureInput } from 'claude-code'
 
 import { bandOf, cacheLeftMs, cacheTtlMs, limitText, tokens } from './logic'
 
-const ME = 'cache-context'
+const ME = 'compact'
 const MIN = 60_000
 const T0 = 1_000_000_000
 

@@ -126,10 +126,10 @@ describe('Entscheidung', () => {
   })
 
   test('eigener Prompt erkannt', async () => {
-    expect(isOwnPrompt({ kind: 'plugin', name: 'cache-context' }, 'cache-context')).toBe(true)
-    expect(isOwnPrompt({ kind: 'plugin', name: 'agenten' }, 'cache-context')).toBe(false)
-    expect(isOwnPrompt({ kind: 'composer' }, 'cache-context')).toBe(false)
-    expect(isOwnPrompt(undefined, 'cache-context')).toBe(false)
+    expect(isOwnPrompt({ kind: 'plugin', name: 'compact' }, 'compact')).toBe(true)
+    expect(isOwnPrompt({ kind: 'plugin', name: 'agenten' }, 'compact')).toBe(false)
+    expect(isOwnPrompt({ kind: 'composer' }, 'compact')).toBe(false)
+    expect(isOwnPrompt(undefined, 'compact')).toBe(false)
   })
 })
 
@@ -272,7 +272,7 @@ describe('Automatik in der Session', () => {
     await clock.advance(50 * MIN)
     expect(seen.prompts.length).toBe(1)
     // So meldet die Engine den Prompt des Mods auch dessen eigenem prompt.submit-Hook.
-    await $.prompt.submit({ text: CHECKPOINT_IDLE_TEXT, origin: { kind: 'plugin', name: 'cache-context' } } as never)
+    await $.prompt.submit({ text: CHECKPOINT_IDLE_TEXT, origin: { kind: 'plugin', name: 'compact' } } as never)
     await turn($)
     await clock.advance(5 * MIN)
     expect(seen.compacts).toEqual([COMPACT_INSTRUCTIONS])
@@ -331,7 +331,7 @@ describe('Automatik in der Session', () => {
   })
 
   test('Ablehnung der Engine erkannt', async () => {
-    expect(isHeadlessRefusal(new Error('HooksError: cache-context: $.session.compact: not available in a headless (-p / SDK) session yet'))).toBe(true)
+    expect(isHeadlessRefusal(new Error('HooksError: compact: $.session.compact: not available in a headless (-p / SDK) session yet'))).toBe(true)
     expect(isHeadlessRefusal(new Error('a turn is running'))).toBe(false)
   })
 })

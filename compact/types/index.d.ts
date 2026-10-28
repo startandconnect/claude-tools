@@ -61,7 +61,7 @@ export type Round = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'cache-context': {
+    'compact': {
       context: Context | null
       limits: Limit[]
       /** Ende der letzten Antwort des Hauptchats; ab da läuft der Cache ab. */

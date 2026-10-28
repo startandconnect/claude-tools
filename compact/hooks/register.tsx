@@ -25,16 +25,16 @@ import {
 } from './logic'
 import type { Part } from './logic'
 
-const context = atom({ plugin: 'cache-context', key: 'context' } as const, null)
-const limits = atom({ plugin: 'cache-context', key: 'limits' } as const, [])
-const lastAnswerAt = atom({ plugin: 'cache-context', key: 'lastAnswerAt' } as const, 0)
-const isRunning = atom({ plugin: 'cache-context', key: 'isRunning' } as const, false)
-const now = atom({ plugin: 'cache-context', key: 'now' } as const, 0)
-const isHidden = atom({ plugin: 'cache-context', key: 'isHidden' } as const, false)
+const context = atom({ plugin: 'compact', key: 'context' } as const, null)
+const limits = atom({ plugin: 'compact', key: 'limits' } as const, [])
+const lastAnswerAt = atom({ plugin: 'compact', key: 'lastAnswerAt' } as const, 0)
+const isRunning = atom({ plugin: 'compact', key: 'isRunning' } as const, false)
+const now = atom({ plugin: 'compact', key: 'now' } as const, 0)
+const isHidden = atom({ plugin: 'compact', key: 'isHidden' } as const, false)
 const AUTO_START: Auto = { phase: 'active', idleSince: 0, checkpointDone: false, isOff: false }
-const auto = atom({ plugin: 'cache-context', key: 'auto' } as const, AUTO_START)
+const auto = atom({ plugin: 'compact', key: 'auto' } as const, AUTO_START)
 
-const ME = 'cache-context'
+const ME = 'compact'
 
 /** Die Automatik läuft in jeder Session; beim Start gesetzt. */
 let isAutoHere = false

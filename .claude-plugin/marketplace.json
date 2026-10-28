@@ -8,8 +8,8 @@
   },
   "plugins": [
     {
-      "name": "cache-context",
-      "source": "./cache-context",
+      "name": "compact",
+      "source": "./compact",
       "description": "Band über dem Eingabefeld (Kontext, Cache, Nutzung) und automatischer Session-Abschluss mit Compact, bevor der Cache abläuft."
     }
   ]
