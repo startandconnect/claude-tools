@@ -24,7 +24,11 @@ Der Abschluss-Prompt schickt den gesicherten Stand und den Status der Aufgaben n
 
 ## Installieren
 
-**In Claude Code:**
+**Mit einem Prompt (empfohlen):** Kopiere den Text aus [INSTALL-PROMPT.md](INSTALL-PROMPT.md) in einen Chat mit Claude Code. Das geht in der Desktop-App und im Terminal. Claude lädt die ZIP-Datei herunter und legt den Mod nach `~/.claude/skills/compact`. Claude Code lädt Mods aus diesem Ordner von selbst. Du brauchst also keinen Befehl mit Schrägstrich, keinen Marketplace und keine Einstellung. Der Mod ist ab dem nächsten neuen Chat aktiv. Ein Update ist derselbe Prompt noch einmal.
+
+**Von Hand:** [compact.zip](https://github.com/startandconnect/claude-tools/releases/latest/download/compact.zip) herunterladen und entpacken. Dann den Ordner `compact/compact` nach `~/.claude/skills/compact` kopieren, mit dem versteckten Ordner `.claude-plugin`. Ist `CLAUDE_CONFIG_DIR` gesetzt, gehört er stattdessen nach `$CLAUDE_CONFIG_DIR/skills/compact`.
+
+**Über den Plugin-Katalog (Terminal):**
 
 ```
 /plugin marketplace add startandconnect/claude-tools
@@ -32,9 +36,7 @@ Der Abschluss-Prompt schickt den gesicherten Stand und den Status der Aufgaben n
 /reload-plugins
 ```
 
-**Claude installieren lassen:** Gib Claude Code den Text aus [INSTALL-PROMPT.md](INSTALL-PROMPT.md).
-
-**Als ZIP-Datei:** [compact.zip](https://github.com/startandconnect/claude-tools/releases/latest/download/compact.zip) herunterladen und entpacken. Dann in Claude Code `/plugin marketplace add <entpackter Ordner>` und `/plugin install compact@claude-tools` eingeben.
+Nutze nur einen dieser Wege, sonst läuft der Mod doppelt.
 
 ## Befehle
 
@@ -56,9 +58,7 @@ Bis Version 1.0.0 hieß der Mod cache-context. Hast du ihn so installiert, entfe
 
 ## Entfernen
 
-```
-/plugin uninstall compact@claude-tools
-```
+Den Ordner `~/.claude/skills/compact` löschen und einen neuen Chat öffnen. Über den Plugin-Katalog installiert: `/plugin uninstall compact@claude-tools`.
 
 ## Lizenz
 

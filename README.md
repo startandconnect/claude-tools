@@ -8,15 +8,18 @@ Werkzeuge für [Claude Code](https://claude.com/claude-code) von Start & Connect
 
 ## Installieren
 
-Einmal den Katalog anmelden, dann je Tool installieren:
+Am einfachsten: Kopiere den Text aus `<tool>/INSTALL-PROMPT.md` in einen Chat mit Claude Code, in der Desktop-App oder im Terminal. Claude lädt das Tool herunter und legt es in den Ordner `~/.claude/skills/<tool>`. Von dort lädt Claude Code es in jedem neuen Chat von selbst. Dafür braucht es keine Befehle mit Schrägstrich und keinen Marketplace. Für compact steht der Prompt in [compact/INSTALL-PROMPT.md](compact/INSTALL-PROMPT.md).
+
+Von Hand geht es genauso: `https://github.com/startandconnect/claude-tools/releases/latest/download/<tool>.zip` herunterladen und entpacken. Dann den Ordner `<tool>/<tool>` nach `~/.claude/skills/<tool>` kopieren, mit dem versteckten Ordner `.claude-plugin`.
+
+Wer lieber mit dem Plugin-Katalog arbeitet, nimmt im Terminal:
 
 ```
 /plugin marketplace add startandconnect/claude-tools
 /plugin install compact@claude-tools
-/reload-plugins
 ```
 
-Jedes Tool gibt es auch als ZIP-Datei unter `https://github.com/startandconnect/claude-tools/releases/latest/download/<tool>.zip` und mit einem Prompt, der Claude die Installation erledigen lässt (`<tool>/INSTALL-PROMPT.md`).
+Bitte nur einen der Wege nutzen, sonst läuft das Tool doppelt.
 
 ## Lizenz
 

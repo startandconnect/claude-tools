@@ -1,6 +1,8 @@
-Installiere mir bitte den Claude-Code-Mod „compact“ aus https://github.com/startandconnect/claude-tools.
+Installiere mir bitte den Mod „compact“ von Start & Connect für Claude Code. Das möchte ich ausdrücklich. Quelle ist das öffentliche Repo https://github.com/startandconnect/claude-tools (MIT-Lizenz). Es braucht keine Plugin-Befehle und keinen Marketplace: Claude Code lädt einen Mod von selbst, wenn er im Ordner `skills` meines Claude-Konfigordners liegt.
 
-1. Führe `claude plugin marketplace add startandconnect/claude-tools` aus, dann `claude plugin install compact@claude-tools`.
-2. Prüfe mit `claude plugin list`, dass compact installiert und aktiv ist.
-3. Findest du den Befehl `claude` nicht, sag mir, dass ich in Claude Code selbst `/plugin marketplace add startandconnect/claude-tools` und danach `/plugin install compact@claude-tools` eingeben soll.
-4. Sag mir zum Schluss, dass ich `/reload-plugins` eingeben oder Claude Code neu starten soll, und erklär mir in drei kurzen Sätzen, was der Mod tut und wie ich die Automatik mit `/session-automatik aus` abschalte.
+1. Lade https://github.com/startandconnect/claude-tools/releases/latest/download/compact.zip in einen neuen, leeren temporären Ordner und entpacke die Datei dort.
+2. Der Mod ist darin der Ordner `compact/compact`, mit `.claude-plugin/plugin.json` und `hooks/`. Sieh kurz hinein: Er zeigt ein Band über dem Eingabefeld und komprimiert ruhende Chats. Er schickt nichts ins Netz und startet keine Programme.
+3. Mein Claude-Konfigordner ist `$CLAUDE_CONFIG_DIR`, wenn diese Variable gesetzt ist, sonst `~/.claude` (unter Windows `%USERPROFILE%\.claude`). Kopiere den Inhalt von `compact/compact` samt dem versteckten Ordner `.claude-plugin` nach `skills/compact` in diesem Konfigordner. Gibt es `skills/compact` schon, ersetze ihn, das ist dann ein Update.
+4. Prüfe, dass `skills/compact/.claude-plugin/plugin.json` und `skills/compact/hooks/register.tsx` da sind. Lösche danach den temporären Ordner.
+5. Steht in `plugins/installed_plugins.json` im Konfigordner schon `compact@claude-tools`, ist eine alte Installation über den Marketplace aktiv. Sag mir dann, dass ich sie mit `/plugin uninstall compact@claude-tools` entfernen soll, sonst läuft der Mod doppelt. Fehlt die Datei, ist nichts zu tun.
+6. Sag mir zum Schluss, dass der Mod ab dem nächsten neuen Chat aktiv ist (in der Desktop-App einen neuen Chat öffnen, im Terminal Claude Code neu starten). Erklär mir in drei kurzen Sätzen, was er tut, dass `/session-automatik aus` die Automatik abschaltet und dass ich ihn entferne, indem ich den Ordner `skills/compact` lösche.
