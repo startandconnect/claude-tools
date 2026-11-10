@@ -19,6 +19,8 @@ Wer lieber mit dem Plugin-Katalog arbeitet, nimmt im Terminal:
 /plugin install compact@claude-tools
 ```
 
+Soll ein Tool nur in einem Arbeitsordner laufen, zum Beispiel mit dem Starterkit von Start & Connect, hängst du an beide Befehle `--scope local` an. Die Einzelheiten stehen in der README des Tools.
+
 Bitte nur einen der Wege nutzen, sonst läuft das Tool doppelt.
 
 ## Lizenz

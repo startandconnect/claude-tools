@@ -36,6 +36,15 @@ Der Abschluss-Prompt schickt den gesicherten Stand und den Status der Aufgaben n
 /reload-plugins
 ```
 
+**Nur für einen Arbeitsordner (Terminal):** Die beiden ersten Wege gelten für alle deine Chats auf dem Rechner. Soll der Mod nur in einem Ordner laufen, installierst du ihn im Arbeitsordner über den Plugin-Katalog mit `--scope local`:
+
+```
+claude plugin marketplace add startandconnect/claude-tools --scope local
+claude plugin install compact@claude-tools --scope local
+```
+
+Das trägt den Mod nur in `<arbeitsordner>/.claude/settings.local.json` ein. Diesen Weg nimmt das Starterkit von Start & Connect, weil es nie global schreibt. Arbeitest du mit dem Starterkit, folge dessen Anleitung und lege den Mod nicht zusätzlich nach `~/.claude/skills/compact`.
+
 Nutze nur einen dieser Wege, sonst läuft der Mod doppelt.
 
 ## Befehle
@@ -54,11 +63,11 @@ Nutze nur einen dieser Wege, sonst läuft der Mod doppelt.
 
 ## Umstieg von cache-context
 
-Bis Version 1.0.0 hieß der Mod cache-context. Hast du ihn so installiert, entferne ihn zuerst mit `/plugin uninstall cache-context@claude-tools`, dann `/plugin marketplace update claude-tools` und `/plugin install compact@claude-tools`.
+Bis Version 1.0.0 hieß der Mod cache-context. Hast du ihn so installiert, entferne ihn zuerst mit `/plugin uninstall cache-context@claude-tools`, dann `/plugin marketplace update claude-tools` und `/plugin install compact@claude-tools`. Lief er nur in einem Arbeitsordner, hängst du an jeden dieser Befehle `--scope local` an.
 
 ## Entfernen
 
-Den Ordner `~/.claude/skills/compact` löschen und einen neuen Chat öffnen. Über den Plugin-Katalog installiert: `/plugin uninstall compact@claude-tools`.
+Den Ordner `~/.claude/skills/compact` löschen und einen neuen Chat öffnen. Über den Plugin-Katalog installiert: `/plugin uninstall compact@claude-tools`, nur für einen Arbeitsordner installiert: `claude plugin uninstall compact@claude-tools --scope local` im Arbeitsordner.
 
 ## Lizenz
 
