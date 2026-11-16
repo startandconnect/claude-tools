@@ -4,7 +4,11 @@ import type { EngineInterface, Register, SessionContextUsage, SessionRateLimit }
 import type { Auto, Limit } from '../types'
 import {
   ATLAS_HINT,
-  CHECKPOINT_IDLE_TEXT,
+  checkpointIdleText,
+  configure,
+  isAutoDir,
+  settings,
+  settingsOf,
   CHECKPOINT_TEST_TEXT,
   CLOCK_STALE_MS,
   COMPACT_INSTRUCTIONS,
@@ -147,7 +151,7 @@ async function compactDone($: $, how: Record<string, unknown>): Promise<void> {
     checkpointAt: undefined,
     compactingSince: undefined,
     owed: false,
-    // Der Testmodus gilt für genau einen Durchlauf; danach wieder 50/55 min.
+    // Der Testmodus gilt für genau einen Durchlauf; danach wieder die eingestellten Zeiten.
     isTest: false,
   }))
   if (before.phase === 'compacting') void $.ui.toast(before.isTest ? 'Test: Session komprimiert.' : 'Session gesichert und komprimiert.')
@@ -226,7 +230,7 @@ async function autoTick($: $, at: number): Promise<void> {
             ? checkpointResumeText(Math.max(0, Math.floor((at - (a.idleSince || at)) / 60_000)))
             : a.isTest
               ? CHECKPOINT_TEST_TEXT
-              : CHECKPOINT_IDLE_TEXT
+              : checkpointIdleText()
       void $.prompt
         .submit({ text })
         .then(() => log($, { event: 'checkpoint-sent', reason }))
@@ -242,7 +246,10 @@ async function autoTick($: $, at: number): Promise<void> {
   }
 }
 
-export const register: Register = on => {
+export const register: Register = (on, options) => {
+  // Grundordner, Abschluss-Prompt und Zeiten aus userConfig (/config); eine Änderung lädt den Mod neu.
+  configure(settingsOf(options))
+
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     const at = await $.clock.now()
@@ -262,7 +269,8 @@ export const register: Register = on => {
       name: 'session-automatik',
       description: 'Zeigt den Stand der Session-Automatik (läuft von selbst); test, normal, aus, an',
     })
-    isAutoHere = true
+    const home = await $.env.get('HOME').catch(() => undefined)
+    isAutoHere = isAutoDir(e.cwd, settings(), home ?? '')
     // Die Uhr fürs Band und für die Automatik. Gesendet wird nur der eigene Abschluss-Prompt.
     startClock($, 'session.start')
     if (isAutoHere) {
@@ -293,7 +301,7 @@ export const register: Register = on => {
       return {
         text: isTest
           ? 'Testmodus: Abschluss-Prompt nach 2 min Ruhe, Compact gleich nach der Antwort darauf. Bis zum Toast nichts schreiben. Zurück mit /session-automatik normal.'
-          : 'Normalbetrieb: Abschluss nach 50 min Ruhe, Compact nach 55 min oder bei 95 % Kontext.',
+          : `Normalbetrieb: Abschluss nach ${settings().checkpointMinutes} min Ruhe, Compact nach ${settings().compactMinutes} min oder bei ${settings().contextPercent} % Kontext.`,
       }
     }
     if (arg === 'aus' || arg === 'an') {
@@ -303,15 +311,18 @@ export const register: Register = on => {
       return {
         text: a.isOff
           ? 'Automatischer Session-Abschluss und Compact für diese Session aus. Wieder an mit /session-automatik an.'
-          : 'Automatischer Session-Abschluss (50 min Ruhe) und Compact (55 min oder 95 % Kontext) an.',
+          : `Automatischer Session-Abschluss (${settings().checkpointMinutes} min Ruhe) und Compact (${settings().compactMinutes} min oder ${settings().contextPercent} % Kontext) an.`,
       }
     }
-    // Ohne Zusatz nur der Stand: die Automatik läuft in ~/claude von selbst, der Befehl schaltet nichts um.
+    // Ohne Zusatz nur der Stand: die Automatik läuft von selbst, der Befehl schaltet nichts um.
     const a = await read($, auto)
     const at = await $.clock.now()
-    const state = a.isOff
+    const s = settings()
+    const state = !isAutoHere
+      ? `aus (nur unter ${s.rootDir})`
+      : a.isOff
         ? 'aus für diese Session'
-        : `an${a.isTest ? ' (Test: 2/4 min)' : ' (50/55 min)'}, Phase ${a.phase}${a.idleSince > 0 && a.phase === 'active' ? `, ruhig seit ${Math.floor((at - a.idleSince) / 60_000)} min` : ''}`
+        : `an${a.isTest ? ' (Test: 2/4 min)' : ` (${s.checkpointMinutes}/${s.compactMinutes} min, ${s.contextPercent} %)`}, Phase ${a.phase}${a.idleSince > 0 && a.phase === 'active' ? `, ruhig seit ${Math.floor((at - a.idleSince) / 60_000)} min` : ''}`
 
     return {
       text: `Session-Automatik: ${state}. Uhr zuletzt vor ${Math.round((at - lastTickAt) / 1000)} s. Letzte Ereignisse: ${logLines.slice(-3).map(l => (JSON.parse(l) as { event?: string }).event).join(', ') || '(noch keine)'}. Befehle: /session-automatik test | normal | aus | an. ${ATLAS_HINT}`,

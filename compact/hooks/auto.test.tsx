@@ -14,6 +14,10 @@ import {
   nextStep,
   restoreRound,
   roundKey,
+  DEFAULTS,
+  checkpointIdleText,
+  isAutoDir,
+  settingsOf,
 } from './logic'
 
 const MIN = 60_000
@@ -474,5 +478,80 @@ describe('Neustart durch die App', () => {
     expect(restoreRound({ phase: 'compacting', idleSince: T0 - 60 * MIN, savedAt: T0 }, T0)).toEqual(
       expect.objectContaining({ phase: 'checkpoint', checkpointDone: true, reason: 'resume' }),
     )
+  })
+})
+
+describe('Einstellungen (userConfig)', () => {
+  test('ohne Werte die Standards, ungültige Werte fallen zurück', async () => {
+    expect(settingsOf(undefined)).toEqual(DEFAULTS)
+    expect(settingsOf({ checkpointMinutes: 0, compactMinutes: 75, contextPercent: 120 })).toEqual(DEFAULTS)
+    // Compact vor dem Abschluss passt nicht: beide Standards.
+    expect(settingsOf({ checkpointMinutes: 40, compactMinutes: 41 })).toEqual(expect.objectContaining({ checkpointMinutes: 50, compactMinutes: 55 }))
+    expect(settingsOf({ checkpointMinutes: 20, compactMinutes: 25, contextPercent: 90, rootDir: ' /home/nutzer ' })).toEqual(
+      expect.objectContaining({ checkpointMinutes: 20, compactMinutes: 25, contextPercent: 90, rootDir: '/home/nutzer/' }),
+    )
+  })
+
+  test('Grundordner: leer überall, sonst nur darunter, ~ für home', async () => {
+    expect(isAutoDir('/tmp', DEFAULTS)).toBe(true)
+    const s = settingsOf({ rootDir: '~/projekte' })
+    expect(isAutoDir('/home/nutzer/projekte/kunde', s, '/home/nutzer')).toBe(true)
+    expect(isAutoDir('/home/nutzer/projekte', s, '/home/nutzer')).toBe(true)
+    expect(isAutoDir('/home/nutzer/projekte-alt', s, '/home/nutzer')).toBe(false)
+    expect(isAutoDir('/tmp', settingsOf({ rootDir: '/home/nutzer' }))).toBe(false)
+  })
+
+  test('Anleitung und eigener Prompt im Abschluss-Text', async () => {
+    const guide = checkpointIdleText(settingsOf({ checkpointGuide: 'Atlas: automatisch-arbeiten/sitzungs-sicherung.md' }))
+    expect(guide).toContain('Geh dabei nach dieser Anleitung vor: Atlas: automatisch-arbeiten/sitzungs-sicherung.md.')
+    expect(guide).toContain('Pflicht: Setz jetzt den Status')
+    const own = checkpointIdleText(settingsOf({ checkpointPrompt: 'Schreib den Stand in NOTIZEN.md.', checkpointMinutes: 30, compactMinutes: 33 }))
+    expect(own).toContain('nach 30 Minuten Ruhe')
+    expect(own).toContain('Schreib den Stand in NOTIZEN.md.')
+    expect(own).toContain('In 3 Minuten komprimiert')
+    expect(own).not.toContain('Pflicht: Setz jetzt den Status')
+    for (const text of [guide, own, CHECKPOINT_IDLE_TEXT]) {
+      expect(text).not.toMatch(/OPERATING-MODEL|Ben|session-checkpoint|\/Users\//)
+    }
+  })
+
+  test('eingestellte Zeiten: Abschluss nach 20 min, Compact nach 25 min', { options: { checkpointMinutes: 20, compactMinutes: 25 } }, async ($, on) => {
+    const { clock, seen } = engine(on)
+    await $.session.start(HERE)
+    await turn($)
+    await clock.advance(19 * MIN)
+    expect(seen.prompts).toEqual([])
+    await clock.advance(1 * MIN)
+    expect(seen.prompts.length).toBe(1)
+    expect(seen.prompts[0]).toContain('nach 20 Minuten Ruhe')
+    await turn($)
+    await clock.advance(5 * MIN)
+    expect(seen.compacts).toEqual([COMPACT_INSTRUCTIONS])
+  })
+
+  test('Grundordner gesetzt: außerhalb keine Automatik', { options: { rootDir: '/home/nutzer/projekte' } }, async ($, on) => {
+    const { clock, seen } = engine(on)
+    await $.session.start({ ...HERE, cwd: '/home/nutzer/privat' })
+    await turn($)
+    await clock.advance(60 * MIN)
+    expect(seen.prompts).toEqual([])
+  })
+
+  test('Grundordner gesetzt: darunter läuft sie', { options: { rootDir: '/home/nutzer' } }, async ($, on) => {
+    const { clock, seen } = engine(on)
+    await $.session.start(HERE)
+    await turn($)
+    await clock.advance(50 * MIN)
+    expect(seen.prompts).toEqual([CHECKPOINT_IDLE_TEXT])
+  })
+
+  test('Kontextgrenze 80 %', { options: { contextPercent: 80 } }, async ($, on) => {
+    const { clock, seen } = engine(on)
+    await $.session.start(HERE)
+    await turn($)
+    await $.session.measure({ changed: ['context'], context: { tokens: 820_000, window: 1_000_000, percent: 82 }, rateLimits: [] } as never)
+    await clock.advance(1 * MIN)
+    expect(seen.prompts.length).toBe(1)
+    expect(seen.prompts[0]).toContain('Grenze 80 %')
   })
 })

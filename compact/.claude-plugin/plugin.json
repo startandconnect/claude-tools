@@ -1,9 +1,47 @@
 {
   "name": "compact",
-  "version": "1.1.0",
-  "description": "Band über dem Eingabefeld (Kontext, Cache, Nutzung) und Automatik: nach 50 min Ruhe sichert der Chat seinen Stand, nach 55 min komprimiert er sich (Compact), bei 95 % Kontext sofort. Beendet die App den Prozess, holt der nächste Start beides nach.",
+  "version": "1.2.0",
+  "description": "Band über dem Eingabefeld (Kontext, Cache, Nutzung) und Automatik: nach 50 min Ruhe sichert der Chat seinen Stand, nach 55 min komprimiert er sich (Compact), bei 95 % Kontext sofort. Zeiten, Grundordner und Abschluss-Prompt lassen sich einstellen. Beendet die App den Prozess, holt der nächste Start beides nach.",
   "author": {
     "name": "Start & Connect"
   },
-  "types": "./types/index.d.ts"
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "rootDir": {
+      "type": "string",
+      "title": "Grundordner",
+      "description": "Die Automatik läuft nur in Chats in diesem Ordner oder darunter, zum Beispiel ~/projekte. Leer: in jedem Chat. Das Band erscheint immer.",
+      "default": ""
+    },
+    "checkpointGuide": {
+      "type": "string",
+      "title": "Anleitung zum Sichern",
+      "description": "Wo steht, wie der Chat beim Session-Abschluss seinen Stand sichert, zum Beispiel ein Playbook in Atlas oder eine Datei im Projekt. Der Abschluss-Prompt verweist darauf. Leer: nur die eingebaute Anweisung.",
+      "default": ""
+    },
+    "checkpointPrompt": {
+      "type": "string",
+      "title": "Eigener Abschluss-Prompt",
+      "description": "Ersetzt die eingebaute Anweisung zum Sichern. Zeiten und der Hinweis auf den Compact stehen weiter davor und danach. Leer: eingebauter Text.",
+      "default": ""
+    },
+    "checkpointMinutes": {
+      "type": "number",
+      "title": "Abschluss nach Minuten Ruhe",
+      "description": "Nach so vielen Minuten ohne neue Nachricht sichert der Chat seinen Stand. 1 bis 57, mindestens 2 Minuten vor dem Compact.",
+      "default": 50
+    },
+    "compactMinutes": {
+      "type": "number",
+      "title": "Compact nach Minuten Ruhe",
+      "description": "Nach so vielen Minuten Ruhe komprimiert sich der Chat. Unter 60, weil der Cache im Abo eine Stunde hält.",
+      "default": 55
+    },
+    "contextPercent": {
+      "type": "number",
+      "title": "Compact ab Kontext (%)",
+      "description": "Ab diesem Kontextstand sichert der Chat seinen Stand und komprimiert sich sofort. 50 bis 99.",
+      "default": 95
+    }
+  }
 }

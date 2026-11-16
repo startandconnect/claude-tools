@@ -47,6 +47,34 @@ Das trägt den Mod nur in `<arbeitsordner>/.claude/settings.local.json` ein. Die
 
 Nutze nur einen dieser Wege, sonst läuft der Mod doppelt.
 
+## Einstellungen
+
+Ab Version 1.2.0 lässt sich die Automatik einstellen. Das geht in Claude Code unter `/config`, bei den Zeilen von compact. Alternativ trägst du die Werte in `settings.json` unter `pluginConfigs` ein: für die Installation per Prompt unter `"compact"`, für den Plugin-Katalog unter `"compact@claude-tools"`, jeweils in `options`. Ein leeres Feld bedeutet: Standard.
+
+| Feld | Standard | Was es tut |
+|---|---|---|
+| `rootDir` | leer | Die Automatik läuft nur in Chats in diesem Ordner oder darunter, zum Beispiel `~/projekte`. Ist das Feld leer, läuft sie in jedem Chat. Das Band erscheint immer. |
+| `checkpointGuide` | leer | Wo steht, wie der Chat beim Abschluss seinen Stand sichert, zum Beispiel ein Playbook in Atlas oder eine Datei im Projekt. Der Abschluss-Prompt verweist zusätzlich zur eingebauten Anweisung darauf. |
+| `checkpointPrompt` | leer | Ein eigener Text ersetzt die eingebaute Anweisung zum Sichern. Der Hinweis auf Zeit und Compact bleibt. |
+| `checkpointMinutes` | 50 | So viele Minuten nach der letzten Antwort kommt der Abschluss-Prompt. Erlaubt sind 1 bis 57. |
+| `compactMinutes` | 55 | So viele Minuten nach der letzten Antwort kommt der Compact. Der Wert muss unter 60 liegen und mindestens 2 Minuten nach dem Abschluss. |
+| `contextPercent` | 95 | Ab diesem Kontextstand sichert der Chat seinen Stand und komprimiert sich sofort. Erlaubt sind 50 bis 99. |
+
+Ungültige Zahlen ersetzt der Mod durch den Standard. Gleiches gilt, wenn der Compact nicht nach dem Abschluss läge. Dann gelten für beide Zeiten die Standards. Ein Beispiel:
+
+```json
+"pluginConfigs": {
+  "compact@claude-tools": {
+    "options": {
+      "rootDir": "~/projekte",
+      "checkpointGuide": "Playbook automatisch-arbeiten, Seite sitzungs-sicherung.md, Abschnitt „Was der Chat beim Sichern tut“"
+    }
+  }
+}
+```
+
+Was gilt, zeigt `/session-automatik`.
+
 ## Befehle
 
 - `/session-automatik` zeigt den Stand.

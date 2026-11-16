@@ -111,14 +111,93 @@ export const COMPACT_AFTER_MS = 55 * MINUTE
 /** Ab diesem Kontextstand: sichern, dann sofort komprimieren. */
 export const CONTEXT_LIMIT = 95
 
+/**
+ * Was sich per userConfig einstellen lässt (/config oder settings.json pluginConfigs.compact.options).
+ * Leere Felder heißen: Standard. Ungültige Zahlen fallen auf den Standard zurück.
+ */
+export type Settings = {
+  /** Automatik nur in Chats in diesem Ordner oder darunter; leer: überall. */
+  rootDir: string
+  /** Wo steht, wie der Chat beim Sichern vorgeht (Datei, Wiki-Seite); leer: eingebaute Anweisung. */
+  checkpointGuide: string
+  /** Eigener Text für den Abschluss-Prompt; leer: eingebauter Text. */
+  checkpointPrompt: string
+  checkpointMinutes: number
+  compactMinutes: number
+  contextPercent: number
+}
+
+export const DEFAULTS: Settings = {
+  rootDir: '',
+  checkpointGuide: '',
+  checkpointPrompt: '',
+  checkpointMinutes: CHECKPOINT_AFTER_MS / MINUTE,
+  compactMinutes: COMPACT_AFTER_MS / MINUTE,
+  contextPercent: CONTEXT_LIMIT,
+}
+
+/** Der Cache hält 60 min; der Compact muss davor liegen, der Abschluss mindestens 2 min vor dem Compact. */
+const CACHE_MINUTES = 60
+
+function num(v: unknown, fallback: number, min: number, max: number): number {
+  const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN
+
+  return Number.isFinite(n) && n >= min && n <= max ? n : fallback
+}
+
+function str(v: unknown): string {
+  return typeof v === 'string' ? v.trim() : ''
+}
+
+/** Liest die userConfig-Werte. Passen Abschluss und Compact nicht zusammen, gelten für beide die Standards. */
+export function settingsOf(options: Readonly<Record<string, unknown>> | undefined): Settings {
+  const o = options ?? {}
+  const checkpointMinutes = num(o.checkpointMinutes, DEFAULTS.checkpointMinutes, 1, CACHE_MINUTES - 3)
+  const compactMinutes = num(o.compactMinutes, DEFAULTS.compactMinutes, 2, CACHE_MINUTES - 1)
+  const isOrdered = compactMinutes >= checkpointMinutes + 2
+  const root = str(o.rootDir)
+
+  return {
+    rootDir: root === '' ? '' : root.endsWith('/') ? root : `${root}/`,
+    checkpointGuide: str(o.checkpointGuide),
+    checkpointPrompt: str(o.checkpointPrompt),
+    checkpointMinutes: isOrdered ? checkpointMinutes : DEFAULTS.checkpointMinutes,
+    compactMinutes: isOrdered ? compactMinutes : DEFAULTS.compactMinutes,
+    contextPercent: num(o.contextPercent, DEFAULTS.contextPercent, 50, 99),
+  }
+}
+
+/** Die geltenden Einstellungen; register setzt sie aus options. */
+let current: Settings = DEFAULTS
+
+export function configure(s: Settings): void {
+  current = s
+}
+
+export function settings(): Settings {
+  return current
+}
+
+/** Läuft die Automatik in diesem Arbeitsordner? `~` im Grundordner steht für home. */
+export function isAutoDir(cwd: string, s: Settings = current, home = ''): boolean {
+  if (s.rootDir === '') return true
+  const root = s.rootDir.startsWith('~/') && home !== '' ? `${home.replace(/\/$/, '')}/${s.rootDir.slice(2)}` : s.rootDir
+
+  return (cwd.endsWith('/') ? cwd : `${cwd}/`).startsWith(root)
+}
+
 /** Die Zeiten der Automatik; im Testmodus (/session-automatik test) kurz. */
 export type Timing = { checkpointMs: number; compactMs: number }
-export const NORMAL: Timing = { checkpointMs: CHECKPOINT_AFTER_MS, compactMs: COMPACT_AFTER_MS }
+export function normalTiming(s: Settings = current): Timing {
+  return { checkpointMs: s.checkpointMinutes * MINUTE, compactMs: s.compactMinutes * MINUTE }
+}
+/** Die Standardzeiten (50/55 min). */
+export const NORMAL: Timing = normalTiming(DEFAULTS)
 /** Im Test kommt der Compact gleich nach der Antwort auf den Abschluss-Prompt. */
 export const TEST: Timing = { checkpointMs: 2 * MINUTE, compactMs: 2 * MINUTE }
 
 export function timingOf(a: Auto): Timing {
-  return a.isTest ? TEST : NORMAL
+  return a.isTest ? TEST : normalTiming()
 }
 
 /**
@@ -143,7 +222,7 @@ export function nextStep(a: Auto, now: number, isRunning: boolean, percent: numb
   if (a.isOff || isRunning) return 'none'
   const t = timingOf(a)
   if (a.phase === 'active') {
-    if ((percent ?? 0) >= CONTEXT_LIMIT) return 'checkpoint-context'
+    if ((percent ?? 0) >= current.contextPercent) return 'checkpoint-context'
     // Nach einem Neustart nachholen, was der beendete Prozess nicht mehr geschafft hat.
     if (a.owed && !hasDraft) return 'checkpoint-resume'
     if (!hasDraft && a.idleSince > 0 && now - a.idleSince >= t.checkpointMs) return 'checkpoint-idle'
@@ -200,7 +279,7 @@ export function roundOf(a: Auto, now: number): Round {
  * - checkpoint ohne Ende des Abschluss-Turns (Prozess mitten im Abschluss beendet): Abschluss noch einmal.
  * - checkpoint fertig oder compacting: der Compact steht noch aus.
  */
-export function restoreRound(saved: unknown, now: number, t: Timing = NORMAL): Partial<Auto> | undefined {
+export function restoreRound(saved: unknown, now: number, t: Timing = normalTiming()): Partial<Auto> | undefined {
   if (!saved || typeof saved !== 'object') return undefined
   const r = saved as Partial<Round>
   if (typeof r.phase !== 'string' || typeof r.idleSince !== 'number') return undefined
@@ -252,33 +331,49 @@ const SAVE_STATE =
 export const ATLAS_HINT =
   'Der Stand landet in Atlas, falls dein Projekt verbunden ist, sonst in den Aufgaben und Notizen des Projekts. Atlas: https://startandconnect.com/atlas'
 
-export const CHECKPOINT_IDLE_TEXT =
-  'Automatischer Session-Abschluss nach 50 Minuten Ruhe (Mod compact). ' +
-  SAVE_STATE +
-  TASK_STATUS_STEP +
-  'Fang nichts Neues an und stell keine Rückfragen. Laufende Hintergrund-Prozesse lässt du laufen. ' +
-  'In 5 Minuten komprimiert sich der Chat automatisch (Compact, kein Clear).'
+/**
+ * Was der Chat beim Sichern tut: ein eigener Prompt ersetzt die eingebaute Anweisung, eine Anleitung ergänzt sie.
+ * Der Pflichtschritt zum Aufgabenstatus gehört zur eingebauten Anweisung.
+ */
+export function saveStep(s: Settings = current): string {
+  if (s.checkpointPrompt !== '') return `${s.checkpointPrompt} `
+  const guide = s.checkpointGuide !== '' ? `Geh dabei nach dieser Anleitung vor: ${s.checkpointGuide}. ` : ''
+
+  return SAVE_STATE + guide + TASK_STATUS_STEP
+}
+
+export function checkpointIdleText(s: Settings = current): string {
+  const left = s.compactMinutes - s.checkpointMinutes
+
+  return (
+    `Automatischer Session-Abschluss nach ${s.checkpointMinutes} Minuten Ruhe (Mod compact). ` +
+    saveStep(s) +
+    'Fang nichts Neues an und stell keine Rückfragen. Laufende Hintergrund-Prozesse lässt du laufen. ' +
+    `In ${left} ${left === 1 ? 'Minute' : 'Minuten'} komprimiert sich der Chat automatisch (Compact, kein Clear).`
+  )
+}
+
+/** Der Abschluss-Prompt mit den Standardeinstellungen. */
+export const CHECKPOINT_IDLE_TEXT = checkpointIdleText(DEFAULTS)
 
 export const CHECKPOINT_TEST_TEXT =
   'Testlauf der Session-Automatik (/session-automatik test): Antworte nur mit einem Satz, dass der Abschluss-Prompt angekommen ist, ' +
   'und tu sonst nichts. Gleich nach deiner Antwort komprimiert sich der Chat automatisch (Compact, kein Clear).'
 
-export function checkpointResumeText(idleMinutes: number): string {
+export function checkpointResumeText(idleMinutes: number, s: Settings = current): string {
   return (
     `Automatischer Session-Abschluss, nachgeholt (Mod compact): Die App hatte diesen Chat nach ${idleMinutes} Minuten Ruhe beendet, ` +
     'bevor Abschluss und Compact liefen. ' +
-    SAVE_STATE +
-    TASK_STATUS_STEP +
+    saveStep(s) +
     'Stell keine Rückfragen, laufende Hintergrund-Prozesse lässt du laufen. ' +
     'Gleich nach deiner Antwort komprimiert sich der Chat automatisch (Compact, kein Clear); danach machst du mit dem gesicherten Stand weiter.'
   )
 }
 
-export function checkpointContextText(percent: number): string {
+export function checkpointContextText(percent: number, s: Settings = current): string {
   return (
-    `Kontext bei ${percent} % (Grenze ${CONTEXT_LIMIT} %, Mod compact). ` +
-    SAVE_STATE +
-    TASK_STATUS_STEP +
+    `Kontext bei ${percent} % (Grenze ${s.contextPercent} %, Mod compact). ` +
+    saveStep(s) +
     'Danach komprimiert sich der Chat automatisch (Compact, kein Clear); danach machst du mit dem gesicherten Stand weiter.'
   )
 }
